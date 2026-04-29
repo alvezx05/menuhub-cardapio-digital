@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MenuHub – Cardápio Digital</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --bg: #0d0b08;
+    --surface: #1a1712;
+    --surface2: #242018;
+    --gold: #e8b84b;
+    --gold2: #f5d07a;
+    --red: #c0392b;
+    --text: #f0ead8;
+    --muted: #8a8070;
+    --border: rgba(232,184,75,0.15);
+    --radius: 16px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--text); font-family:'DM Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+  /* ---- NAV ---- */
+  nav {
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:20px 48px;
+    background:linear-gradient(to bottom, rgba(13,11,8,0.95), transparent);
+    backdrop-filter:blur(8px);
+  }
+  .logo { font-family:'Playfair Display',serif; font-size:1.6rem; color:var(--gold); letter-spacing:1px; }
+  .logo span { color:var(--text); }
+  .nav-btn {
+    background:var(--gold); color:#0d0b08; border:none; padding:10px 28px;
+    border-radius:40px; font-family:'DM Sans',sans-serif; font-weight:600;
+    font-size:0.9rem; cursor:pointer; transition:all .2s;
+  }
+  .nav-btn:hover { background:var(--gold2); transform:translateY(-1px); }
+
+  /* ---- HERO ---- */
+  .hero {
+    position:relative; min-height:100vh;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center; padding:0 24px;
+    overflow:hidden;
+  }
+  .hero-bg {
+    position:absolute; inset:0;
+    background-size:cover; background-position:center;
+    filter:brightness(0.25) saturate(0.7);
+  }
+  .hero-overlay {
+    position:absolute; inset:0;
+    background:radial-gradient(ellipse at center, transparent 30%, rgba(13,11,8,0.85) 100%);
+  }
+  .hero-content { position:relative; z-index:2; max-width:700px; }
+  .hero-badge {
+    display:inline-block; background:rgba(232,184,75,0.15); border:1px solid var(--border);
+    color:var(--gold); padding:6px 20px; border-radius:40px; font-size:0.8rem;
+    letter-spacing:3px; text-transform:uppercase; margin-bottom:28px;
+    animation: fadeUp .8s ease both;
+  }
+  .hero h1 {
+    font-family:'Playfair Display',serif; font-size:clamp(2.8rem,7vw,5.5rem);
+    line-height:1.05; font-weight:900; margin-bottom:24px;
+    animation: fadeUp .8s .15s ease both;
+  }
+  .hero h1 em { color:var(--gold); font-style:normal; }
+  .hero p {
+    font-size:1.1rem; color:var(--muted); line-height:1.7; margin-bottom:44px;
+    animation: fadeUp .8s .3s ease both;
+  }
+  .hero-btns { display:flex; gap:16px; justify-content:center; flex-wrap:wrap; animation: fadeUp .8s .45s ease both; }
+  .btn-primary {
+    background:var(--gold); color:#0d0b08; border:none;
+    padding:16px 40px; border-radius:50px; font-size:1rem; font-weight:700;
+    cursor:pointer; transition:all .25s; display:inline-flex; align-items:center; gap:10px;
+  }
+  .btn-primary:hover { background:var(--gold2); transform:translateY(-2px); box-shadow:0 12px 32px rgba(232,184,75,0.3); }
+  .btn-outline {
+    background:transparent; color:var(--text); border:1.5px solid rgba(240,234,216,0.3);
+    padding:16px 40px; border-radius:50px; font-size:1rem; font-weight:500;
+    cursor:pointer; transition:all .25s;
+  }
+  .btn-outline:hover { border-color:var(--gold); color:var(--gold); }
+
+  /* ---- FEATURES ---- */
+  .features { padding:100px 48px; max-width:1100px; margin:0 auto; }
+  .section-tag { color:var(--gold); font-size:0.8rem; letter-spacing:3px; text-transform:uppercase; margin-bottom:16px; }
+  .section-title { font-family:'Playfair Display',serif; font-size:2.4rem; margin-bottom:60px; }
+  .feature-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px; }
+  .feature-card {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:var(--radius); padding:36px 28px;
+    transition:all .3s;
+  }
+  .feature-card:hover { transform:translateY(-4px); border-color:rgba(232,184,75,0.4); }
+  .feature-icon { width:52px; height:52px; background:rgba(232,184,75,0.1); border-radius:12px;
+    display:flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:1.3rem; color:var(--gold); }
+  .feature-card h3 { font-size:1.1rem; font-weight:600; margin-bottom:10px; }
+  .feature-card p { color:var(--muted); font-size:0.9rem; line-height:1.7; }
+
+  /* ---- MODAL ---- */
+  .modal-overlay {
+    display:none; position:fixed; inset:0; z-index:200;
+    background:rgba(0,0,0,0.75); backdrop-filter:blur(6px);
+    align-items:center; justify-content:center; padding:20px;
+  }
+  .modal-overlay.active { display:flex; }
+  .modal {
+    background:var(--surface); border:1px solid var(--border);
+    border-radius:24px; width:100%; max-width:440px;
+    padding:40px; position:relative;
+    animation: modalIn .35s cubic-bezier(.22,1,.36,1) both;
+  }
+  @keyframes modalIn { from { opacity:0; transform:scale(.92) translateY(20px); } to { opacity:1; transform:none; } }
+  .modal-close {
+    position:absolute; top:20px; right:20px; background:var(--surface2);
+    border:none; color:var(--muted); width:36px; height:36px; border-radius:50%;
+    cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center;
+    transition:all .2s;
+  }
+  .modal-close:hover { color:var(--text); background:var(--border); }
+  .modal-logo { font-family:'Playfair Display',serif; color:var(--gold); font-size:1.4rem; margin-bottom:8px; }
+  .modal-sub { color:var(--muted); font-size:0.9rem; margin-bottom:32px; }
+  .tabs { display:flex; gap:4px; background:var(--bg); border-radius:10px; padding:4px; margin-bottom:28px; }
+  .tab {
+    flex:1; padding:10px; border:none; background:transparent;
+    color:var(--muted); border-radius:8px; cursor:pointer; font-family:'DM Sans',sans-serif;
+    font-size:0.9rem; font-weight:500; transition:all .2s;
+  }
+  .tab.active { background:var(--gold); color:#0d0b08; font-weight:700; }
+  .form-group { margin-bottom:18px; }
+  .form-group label { display:block; font-size:0.85rem; color:var(--muted); margin-bottom:8px; }
+  .form-group input {
+    width:100%; background:var(--surface2); border:1px solid var(--border);
+    border-radius:10px; padding:13px 16px; color:var(--text);
+    font-family:'DM Sans',sans-serif; font-size:0.95rem; outline:none; transition:border .2s;
+  }
+  .form-group input:focus { border-color:var(--gold); }
+  .form-group input::placeholder { color:var(--muted); }
+  .submit-btn {
+    width:100%; background:var(--gold); color:#0d0b08; border:none;
+    padding:14px; border-radius:12px; font-family:'DM Sans',sans-serif;
+    font-size:1rem; font-weight:700; cursor:pointer; margin-top:8px; transition:all .2s;
+  }
+  .submit-btn:hover { background:var(--gold2); }
+  .msg { padding:12px 16px; border-radius:10px; font-size:0.9rem; margin-bottom:16px; display:none; }
+  .msg.error { background:rgba(192,57,43,0.15); border:1px solid rgba(192,57,43,0.3); color:#e74c3c; display:block; }
+  .msg.success { background:rgba(39,174,96,0.15); border:1px solid rgba(39,174,96,0.3); color:#2ecc71; display:block; }
+
+  /* ---- FOOTER ---- */
+  footer { text-align:center; padding:40px; color:var(--muted); font-size:0.85rem; border-top:1px solid var(--border); }
+  footer span { color:var(--gold); }
+
+  @keyframes fadeUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:none; } }
+
+  @media(max-width:600px) {
+    nav { padding:16px 20px; }
+    .features { padding:60px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Menu<span>Hub</span></div>
+  <button class="nav-btn" onclick="openModal()"><i class="fas fa-user"></i> Entrar</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg" id="heroBg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fas fa-star"></i> &nbsp; Cardápio Digital Premium</div>
+    <h1>Peça o que <em>há de melhor</em> com um clique</h1>
+    <p>Hambúrgueres artesanais, ingredientes selecionados e entrega direto pra você.<br>Faça seu pedido e receba confirmação pelo WhatsApp.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="openModal('login')"><i class="fas fa-utensils"></i> Ver Cardápio</button>
+      <button class="btn-outline" onclick="openModal('register')"><i class="fas fa-user-plus"></i> Criar Conta</button>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="section-tag">Por que o MenuHub?</div>
+  <div class="section-title">Uma experiência completa</div>
+  <div class="feature-grid">
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+      <h3>Pedido pelo celular</h3>
+      <p>Interface simples e rápida para montar seu pedido com poucos toques.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fab fa-whatsapp"></i></div>
+      <h3>Confirmação no WhatsApp</h3>
+      <p>Seu pedido é enviado diretamente ao restaurante via WhatsApp. Simples e rápido.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-history"></i></div>
+      <h3>Histórico salvo</h3>
+      <p>Todos os seus pedidos anteriores ficam salvos para facilitar pedidos futuros.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-fire"></i></div>
+      <h3>Ofertas da semana</h3>
+      <p>Promoções e descontos exclusivos renovados toda semana pelo administrador.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-lightbulb"></i></div>
+      <h3>Sugestões inteligentes</h3>
+      <p>O sistema aprende seus gostos e sugere pratos baseados no seu histórico.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+      <h3>Conta segura</h3>
+      <p>Cadastro simples com e-mail e senha. Seus dados salvos com segurança.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2026 <span>MenuHub</span> — Cardápio Digital. Todos os direitos reservados.</p>
+  <p style="margin-top:8px;">Desenvolvido com <span>♥</span> para oferecer a melhor experiência gastronômica.</p>
+</footer>
+
+<!-- MODAL LOGIN/CADASTRO -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-logo">MenuHub</div>
+    <div class="modal-sub">Acesse seu cardápio exclusivo</div>
+
+    <div class="tabs">
+      <button class="tab active" id="tabLogin" onclick="switchTab('login')">Entrar</button>
+      <button class="tab" id="tabRegister" onclick="switchTab('register')">Criar Conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="formLogin">
+      <div class="msg" id="loginMsg"></div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="submit-btn" onclick="doLogin()"><i class="fas fa-sign-in-alt"></i> Entrar</button>
+    </div>
+
+    <!-- CADASTRO -->
+    <div id="formRegister" style="display:none">
+      <div class="msg" id="registerMsg"></div>
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="regName" placeholder="Seu nome"/>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="regEmail" placeholder="seu@email.com"/>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="regPass" placeholder="Mínimo 6 caracteres" onkeydown="if(event.key==='Enter')doRegister()"/>
+      </div>
+      <button class="submit-btn" onclick="doRegister()"><i class="fas fa-user-plus"></i> Criar Conta</button>
+    </div>
+  </div>
+</div>
+
+<script src="images.js"></script>
+<script src="data.js"></script>
+<script>
+  // Carregar bg
+  document.getElementById('heroBg').style.backgroundImage = `url(${img_bg})`;
+
+  // Verificar se já logado
+  window.onload = () => {
+    const s = DB.getSession();
+    if (s) window.location.href = 'cardapio.html';
+  };
+
+  function openModal(tab = 'login') {
+    document.getElementById('modalOverlay').classList.add('active');
+    switchTab(tab);
+  }
+  function closeModal(e) {
+    if (!e || e.target === document.getElementById('modalOverlay')) {
+      document.getElementById('modalOverlay').classList.remove('active');
+    }
+  }
+  function switchTab(tab) {
+    document.getElementById('formLogin').style.display = tab === 'login' ? 'block' : 'none';
+    document.getElementById('formRegister').style.display = tab === 'register' ? 'block' : 'none';
+    document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+    document.getElementById('tabRegister').classList.toggle('active', tab === 'register');
+  }
+  function showMsg(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = 'msg ' + type;
+  }
+  function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+    if (!email || !pass) return showMsg('loginMsg', 'Preencha todos os campos.', 'error');
+    const r = DB.loginUser(email, pass);
+    if (!r.ok) return showMsg('loginMsg', r.msg, 'error');
+    showMsg('loginMsg', 'Bem-vindo(a)! Redirecionando...', 'success');
+    setTimeout(() => window.location.href = 'cardapio.html', 800);
+  }
+  function doRegister() {
+    const name = document.getElementById('regName').value.trim();
+    const email = document.getElementById('regEmail').value.trim();
+    const pass = document.getElementById('regPass').value;
+    if (!name || !email || !pass) return showMsg('registerMsg', 'Preencha todos os campos.', 'error');
+    if (pass.length < 6) return showMsg('registerMsg', 'Senha deve ter no mínimo 6 caracteres.', 'error');
+    const r = DB.registerUser(name, email, pass);
+    if (!r.ok) return showMsg('registerMsg', r.msg, 'error');
+    showMsg('registerMsg', 'Conta criada! Fazendo login...', 'success');
+    DB.loginUser(email, pass);
+    setTimeout(() => window.location.href = 'cardapio.html', 800);
+  }
+</script>
+</body>
+</html>

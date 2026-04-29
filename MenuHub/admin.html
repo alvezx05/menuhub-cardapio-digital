@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>MenuHub – Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d0b08;--surface:#1a1712;--surface2:#242018;--surface3:#2e2a20;
+  --gold:#e8b84b;--gold2:#f5d07a;--red:#e74c3c;--green:#2ecc71;
+  --text:#f0ead8;--muted:#8a8070;--border:rgba(232,184,75,0.15);--radius:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;}
+
+/* LOGIN ADMIN */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(ellipse at 50% 0%,rgba(232,184,75,0.08),transparent 60%);}
+
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:24px;
+  padding:48px;width:100%;max-width:420px;}
+
+.login-logo{font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gold);margin-bottom:4px;}
+
+.login-sub{color:var(--muted);font-size:0.9rem;margin-bottom:32px;}
+
+.admin-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(231,76,60,0.15);
+  border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:4px 14px;border-radius:20px;
+  font-size:0.78rem;font-weight:600;letter-spacing:1px;margin-bottom:28px;}
+
+.form-group{margin-bottom:18px;}
+
+.form-group label{display:block;font-size:0.85rem;color:var(--muted);margin-bottom:8px;}
+
+.form-group input{width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:13px 16px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:0.95rem;outline:none;transition:border .2s;}
+
+.form-group input:focus{border-color:var(--gold);}
+
+.form-group input::placeholder{color:var(--muted);}
+
+.submit-btn{width:100%;background:var(--gold);color:#0d0b08;border:none;padding:14px;
+  border-radius:12px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;}
+
+.submit-btn:hover{background:var(--gold2);}
+
+.msg{padding:10px 14px;border-radius:8px;font-size:0.88rem;margin-bottom:14px;display:none;}
+
+.msg.error{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);color:#e74c3c;display:block;}
+
+.back-link{display:block;text-align:center;margin-top:16px;color:var(--muted);font-size:0.85rem;text-decoration:none;}
+
+.back-link:hover{color:var(--gold);}
+
+/* DASHBOARD */
+.dashboard{display:none;}
+
+.topbar{position:sticky;top:0;z-index:50;background:rgba(13,11,8,0.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);padding:0 28px;height:64px;
+  display:flex;align-items:center;justify-content:space-between;}
+
+.logo{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--gold);}
+.logo span{color:var(--text);}
+
+.topbar-right{display:flex;align-items:center;gap:12px;}
+
+.admin-pill{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.3);
+  color:#e74c3c;padding:4px 14px;border-radius:20px;font-size:0.78rem;font-weight:600;}
+
+.icon-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text);
+  width:40px;height:40px;border-radius:10px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:0.95rem;transition:all .2s;}
+
+.icon-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+.content{display:flex;gap:0;min-height:calc(100vh - 64px);}
+/* SIDEBAR NAV */
+.sidenav{width:220px;background:var(--surface);border-right:1px solid var(--border);
+  padding:24px 12px;position:sticky;top:64px;height:calc(100vh - 64px);}
+
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:10px;
+  cursor:pointer;color:var(--muted);font-size:0.9rem;transition:all .2s;margin-bottom:4px;}
+
+.nav-item.active{background:rgba(232,184,75,.1);color:var(--gold);}
+
+.nav-item i{width:18px;text-align:center;}
+
+/* MAIN CONTENT */
+.main{flex:1;padding:28px;overflow:auto;}
+
+.page{display:none;}
+
+.page.active{display:block;}
+
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;}
+
+.page-title{font-family:'Playfair Display',serif;font-size:1.6rem;}
+
+.btn-add{background:var(--gold);color:#0d0b08;border:none;padding:10px 24px;
+  border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;
+  cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .2s;}
+
+.btn-add:hover{background:var(--gold2);}
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;margin-bottom:32px;}
+
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;}
+
+.stat-icon{font-size:1.4rem;margin-bottom:14px;}
+
+.stat-val{font-size:1.8rem;font-weight:700;color:var(--gold);}
+
+.stat-label{font-size:0.85rem;color:var(--muted);margin-top:4px;}
+
+/* TABLE */
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+th{background:var(--surface2);padding:14px 16px;text-align:left;font-size:0.8rem;
+  color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:600;}
+td{padding:14px 16px;border-bottom:1px solid var(--border);font-size:0.88rem;vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(232,184,75,.03);}
+
+.prod-thumb{width:44px;height:44px;border-radius:8px;object-fit:cover;}
+
+.td-actions{display:flex;gap:8px;}
+
+.act-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);
+  width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;font-size:0.85rem;transition:all .2s;}
+
+.act-btn.edit:hover{border-color:var(--gold);color:var(--gold);}
+
+.act-btn.del:hover{border-color:var(--red);color:var(--red);}
+
+.disc-badge{background:rgba(231,76,60,.15);color:#e74c3c;border:1px solid rgba(231,76,60,.3);
+  padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;}
+
+.feat-badge{background:rgba(232,184,75,.15);color:var(--gold);border:1px solid rgba(232,184,75,.25);
+  padding:2px 8px;border-radius:6px;font-size:0.75rem;font-weight:600;}
+/* MODAL PRODUTO */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(6px);
+  align-items:center;justify-content:center;padding:20px;}
+
+.modal-overlay.active{display:flex;}
+
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  width:100%;max-width:500px;padding:36px;position:relative;
+  animation:modalIn .3s cubic-bezier(.22,1,.36,1)both;max-height:90vh;overflow-y:auto;}
+@keyframes modalIn{from{opacity:0;transform:scale(.93)}to{opacity:1;transform:none}}
+
+.modal-title{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:24px;}
+
+.modal-close{position:absolute;top:16px;right:16px;background:var(--surface2);
+  border:none;color:var(--muted);width:34px;height:34px;border-radius:50%;cursor:pointer;
+  font-size:0.95rem;display:flex;align-items:center;justify-content:center;}
+
+.modal-close:hover{color:var(--text);}
+
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+select{width:100%;background:var(--surface2);border:1px solid var(--border);
+  border-radius:10px;padding:13px 16px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:0.95rem;outline:none;transition:border .2s;appearance:none;}
+select:focus{border-color:var(--gold);}
+
+.checkbox-group{display:flex;align-items:center;gap:10px;padding:10px 0;}
+
+.checkbox-group input[type=checkbox]{width:18px;height:18px;accent-color:var(--gold);cursor:pointer;}
+
+.checkbox-group label{font-size:0.9rem;cursor:pointer;}
+/* ORDERS */
+.order-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:14px;}
+
+.order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+
+.order-id{font-size:0.8rem;color:var(--muted);}
+
+.order-total{color:var(--gold);font-weight:700;font-size:1.1rem;}
+
+.order-user{font-weight:600;margin-bottom:6px;}
+
+.order-items{font-size:0.85rem;color:var(--muted);line-height:1.7;}
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--gold);
+  color:var(--text);padding:12px 24px;border-radius:12px;font-size:0.9rem;
+  z-index:300;transform:translateY(80px);opacity:0;transition:all .3s;}
+  
+.toast.show{transform:translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN ADMIN -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">MenuHub</div>
+    <div class="login-sub">Painel Administrativo</div>
+    <div class="admin-badge"><i class="fas fa-shield-alt"></i> ACESSO RESTRITO</div>
+    <div class="msg" id="loginMsg"></div>
+    <div class="form-group">
+      <label>Senha do Administrador</label>
+      <input type="password" id="adminPass" placeholder="Digite a senha admin" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <button class="submit-btn" onclick="doAdminLogin()"><i class="fas fa-unlock"></i> Entrar como Admin</button>
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar ao site</a>
+    <div style="margin-top:20px;padding:12px;background:var(--surface2);border-radius:10px;font-size:0.8rem;color:var(--muted)">
+      <i class="fas fa-info-circle" style="color:var(--gold)"></i> Senha padrão: <strong style="color:var(--text)">admin123</strong>
+    </div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <div class="topbar">
+    <div class="logo">Menu<span>Hub</span> <span style="font-family:DM Sans;font-size:.7rem;color:var(--muted);font-weight:400;margin-left:8px">Admin</span></div>
+    <div class="topbar-right">
+      <span class="admin-pill"><i class="fas fa-shield-alt"></i> Administrador</span>
+      <button class="icon-btn" onclick="adminLogout()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+    </div>
+  </div>
+  <div class="content">
+    <!-- SIDENAV -->
+    <div class="sidenav">
+      <div class="nav-item active" onclick="showPage('overview')"><i class="fas fa-chart-bar"></i> Visão Geral</div>
+      <div class="nav-item" onclick="showPage('produtos')"><i class="fas fa-hamburger"></i> Produtos</div>
+      <div class="nav-item" onclick="showPage('pedidos')"><i class="fas fa-receipt"></i> Pedidos</div>
+      <div class="nav-item" onclick="showPage('configuracoes')"><i class="fas fa-cog"></i> Configurações</div>
+    </div>
+    <!-- MAIN -->
+    <div class="main">
+
+      <!-- VISÃO GERAL -->
+      <div class="page active" id="page-overview">
+        <div class="page-header"><div class="page-title">Visão Geral</div></div>
+        <div class="stats-grid" id="statsGrid"></div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;margin-bottom:16px;color:var(--muted)">Pedidos recentes</div>
+        <div id="recentOrders"></div>
+      </div>
+
+      <!-- PRODUTOS -->
+      <div class="page" id="page-produtos">
+        <div class="page-header">
+          <div class="page-title">Produtos</div>
+          <button class="btn-add" onclick="openProductModal()"><i class="fas fa-plus"></i> Novo Produto</button>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr>
+              <th>Foto</th><th>Nome</th><th>Categoria</th>
+              <th>Preço</th><th>Desconto</th><th>Status</th><th>Ações</th>
+            </tr></thead>
+            <tbody id="productsTable"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PEDIDOS -->
+      <div class="page" id="page-pedidos">
+        <div class="page-header"><div class="page-title">Todos os Pedidos</div></div>
+        <div id="allOrders"></div>
+      </div>
+
+      <!-- CONFIGURAÇÕES -->
+      <div class="page" id="page-configuracoes">
+        <div class="page-header"><div class="page-title">Configurações</div></div>
+        <div style="max-width:480px;">
+          <div class="table-wrap" style="padding:28px;border-radius:var(--radius);">
+            <div style="font-weight:600;margin-bottom:20px;font-size:1rem"><i class="fas fa-lock" style="color:var(--gold);margin-right:8px"></i>Alterar Senha Admin</div>
+            <div class="form-group">
+              <label>Nova Senha</label>
+              <input type="password" id="newPass1" placeholder="Nova senha"/>
+            </div>
+            <div class="form-group">
+              <label>Confirmar Senha</label>
+              <input type="password" id="newPass2" placeholder="Confirme a nova senha"/>
+            </div>
+            <div class="msg" id="passMsg" style="display:none"></div>
+            <button class="btn-add" onclick="changeAdminPass()"><i class="fas fa-save"></i> Salvar Senha</button>
+          </div>
+          <div class="table-wrap" style="padding:28px;border-radius:var(--radius);margin-top:20px;">
+            <div style="font-weight:600;margin-bottom:12px;font-size:1rem"><i class="fas fa-trash" style="color:var(--red);margin-right:8px"></i>Zona de Perigo</div>
+            <p style="font-size:.85rem;color:var(--muted);margin-bottom:16px">Resetar todos os produtos para os padrões de fábrica.</p>
+            <button class="btn-add" style="background:var(--red);color:#fff" onclick="resetProducts()"><i class="fas fa-redo"></i> Resetar Produtos</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PRODUTO -->
+<div class="modal-overlay" id="prodModal" onclick="closeProdModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeProdModal()"><i class="fas fa-times"></i></button>
+    <div class="modal-title" id="modalTitle">Novo Produto</div>
+    <input type="hidden" id="editId"/>
+    <div class="form-group">
+      <label>Nome do Produto</label>
+      <input type="text" id="pName" placeholder="Ex: Classic Burger"/>
+    </div>
+    <div class="form-group">
+      <label>Descrição</label>
+      <input type="text" id="pDesc" placeholder="Ingredientes e detalhes"/>
+    </div>
+    <div class="row2">
+      <div class="form-group">
+        <label>Categoria</label>
+        <select id="pCat">
+          <option value="hamburguer">Hambúrguer</option>
+          <option value="bebida">Bebida</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Imagem</label>
+        <select id="pImg">
+          <option value="hamb_1">Hambúrguer 1</option>
+          <option value="hamb_2">Hambúrguer 2</option>
+          <option value="hamb_3">Hambúrguer 3</option>
+          <option value="hamb_4">Hambúrguer 4</option>
+          <option value="hamb_5">Hambúrguer 5</option>
+          <option value="hamb_6">Hambúrguer 6</option>
+          <option value="hamb_7">Hambúrguer 7</option>
+          <option value="hamb_8">Hambúrguer 8</option>
+          <option value="refri_1">Refrigerante 1</option>
+          <option value="refri_2">Refrigerante 2</option>
+        </select>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="form-group">
+        <label>Preço (R$)</label>
+        <input type="number" id="pPrice" placeholder="0.00" step="0.01"/>
+      </div>
+      <div class="form-group">
+        <label>Desconto (%)</label>
+        <input type="number" id="pDiscount" placeholder="0" min="0" max="100"/>
+      </div>
+    </div>
+    <div class="checkbox-group">
+      <input type="checkbox" id="pFeatured"/>
+      <label for="pFeatured">★ Produto em destaque (Oferta da Semana)</label>
+    </div>
+    <button class="submit-btn" style="margin-top:20px" onclick="saveProduct()"><i class="fas fa-save"></i> Salvar Produto</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script src="images.js"></script>
+<script src="data.js"></script>
+<script>
+const IMAGES = { hamb_1:img_hamb_1, hamb_2:img_hamb_2, hamb_3:img_hamb_3, hamb_4:img_hamb_4,
+  hamb_5:img_hamb_5, hamb_6:img_hamb_6, hamb_7:img_hamb_7, hamb_8:img_hamb_8,
+  refri_1:img_refri_1, refri_2:img_refri_2 };
+function getImg(k) { return IMAGES[k] || ''; }
+function fmt(v) { return 'R$ ' + v.toFixed(2).replace('.',','); }
+
+// LOGIN
+function doAdminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (!pass) return;
+  if (!DB.checkAdmin(pass)) {
+    const el = document.getElementById('loginMsg');
+    el.textContent = 'Senha incorreta.';
+    el.className = 'msg error';
+    return;
+  }
+  sessionStorage.setItem('mh_admin', '1');
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderAll();
+}
+function adminLogout() {
+  sessionStorage.removeItem('mh_admin');
+  window.location.reload();
+}
+window.onload = () => {
+  if (sessionStorage.getItem('mh_admin')) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+    renderAll();
+  }
+};
+
+// PAGES
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'overview') renderOverview();
+  if (id === 'produtos') renderProducts();
+  if (id === 'pedidos') renderAllOrders();
+}
+
+function renderAll() { renderOverview(); renderProducts(); }
+
+// OVERVIEW
+function renderOverview() {
+  const products = DB.getProducts();
+  const orders = DB.getOrders();
+  const users = DB.getUsers();
+  const totalRevenue = orders.reduce((a,o) => a+o.total, 0);
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-icon" style="color:var(--gold)"><i class="fas fa-hamburger"></i></div>
+      <div class="stat-val">${products.length}</div><div class="stat-label">Produtos cadastrados</div></div>
+    <div class="stat-card"><div class="stat-icon" style="color:#2ecc71"><i class="fas fa-receipt"></i></div>
+      <div class="stat-val">${orders.length}</div><div class="stat-label">Pedidos realizados</div></div>
+    <div class="stat-card"><div class="stat-icon" style="color:#3498db"><i class="fas fa-users"></i></div>
+      <div class="stat-val">${users.length}</div><div class="stat-label">Clientes cadastrados</div></div>
+    <div class="stat-card"><div class="stat-icon" style="color:var(--gold)"><i class="fas fa-dollar-sign"></i></div>
+      <div class="stat-val">${fmt(totalRevenue)}</div><div class="stat-label">Receita total</div></div>`;
+  const recent = orders.slice(0,5);
+  document.getElementById('recentOrders').innerHTML = recent.length ? recent.map(o => orderCard(o)).join('') :
+    '<p style="color:var(--muted);font-size:.9rem">Nenhum pedido ainda.</p>';
+}
+
+// PRODUTOS TABLE
+function renderProducts() {
+  const products = DB.getProducts();
+  document.getElementById('productsTable').innerHTML = products.map(p => `
+    <tr>
+      <td><img class="prod-thumb" src="${getImg(p.img)}" alt="${p.name}"/></td>
+      <td><strong>${p.name}</strong></td>
+      <td style="text-transform:capitalize">${p.category}</td>
+      <td>${fmt(p.price)}</td>
+      <td>${p.discount > 0 ? `<span class="disc-badge">-${p.discount}%</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+      <td>${p.featured ? '<span class="feat-badge">★ Destaque</span>' : '<span style="color:var(--muted);font-size:.8rem">Normal</span>'}</td>
+      <td><div class="td-actions">
+        <button class="act-btn edit" onclick="openProductModal(${p.id})" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="act-btn del" onclick="deleteProduct(${p.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div></td>
+    </tr>`).join('');
+}
+
+// PEDIDOS
+function renderAllOrders() {
+  const orders = DB.getOrders();
+  document.getElementById('allOrders').innerHTML = orders.length ?
+    orders.map(o => orderCard(o)).join('') :
+    '<p style="color:var(--muted)">Nenhum pedido ainda.</p>';
+}
+function orderCard(o) {
+  const d = new Date(o.date);
+  const ds = d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  return `<div class="order-card">
+    <div class="order-top">
+      <span class="order-id"><i class="fas fa-hashtag"></i> ${String(o.id).slice(-6)} &nbsp;·&nbsp; <i class="fas fa-clock"></i> ${ds}</span>
+      <span class="order-total">${fmt(o.total)}</span>
+    </div>
+    <div class="order-user"><i class="fas fa-user" style="color:var(--gold);margin-right:6px"></i>${o.userName}</div>
+    <div class="order-items">${o.items.map(i=>`${i.qty}x ${i.name}`).join(' · ')}</div>
+    ${o.note ? `<div style="font-size:.82rem;color:var(--muted);margin-top:8px"><i class="fas fa-comment-alt"></i> ${o.note}</div>` : ''}
+  </div>`;
+}
+
+// MODAL PRODUTO
+function openProductModal(id) {
+  const modal = document.getElementById('prodModal');
+  if (id) {
+    const p = DB.getProducts().find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('modalTitle').textContent = 'Editar Produto';
+    document.getElementById('editId').value = id;
+    document.getElementById('pName').value = p.name;
+    document.getElementById('pDesc').value = p.desc;
+    document.getElementById('pCat').value = p.category;
+    document.getElementById('pImg').value = p.img;
+    document.getElementById('pPrice').value = p.price;
+    document.getElementById('pDiscount').value = p.discount || 0;
+    document.getElementById('pFeatured').checked = !!p.featured;
+  } else {
+    document.getElementById('modalTitle').textContent = 'Novo Produto';
+    document.getElementById('editId').value = '';
+    document.getElementById('pName').value = '';
+    document.getElementById('pDesc').value = '';
+    document.getElementById('pCat').value = 'hamburguer';
+    document.getElementById('pImg').value = 'hamb_1';
+    document.getElementById('pPrice').value = '';
+    document.getElementById('pDiscount').value = 0;
+    document.getElementById('pFeatured').checked = false;
+  }
+  modal.classList.add('active');
+}
+function closeProdModal(e) {
+  if (!e || e.target === document.getElementById('prodModal'))
+    document.getElementById('prodModal').classList.remove('active');
+}
+function saveProduct() {
+  const name = document.getElementById('pName').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  const cat = document.getElementById('pCat').value;
+  const img = document.getElementById('pImg').value;
+  const price = parseFloat(document.getElementById('pPrice').value);
+  const discount = parseInt(document.getElementById('pDiscount').value) || 0;
+  const featured = document.getElementById('pFeatured').checked;
+  if (!name || !price) return showToast('Preencha nome e preço!');
+  const editId = document.getElementById('editId').value;
+  if (editId) {
+    DB.updateProduct(+editId, {name,desc,category:cat,img,price,discount,featured});
+    showToast('Produto atualizado! ✅');
+  } else {
+    DB.addProduct({name,desc,category:cat,img,price,discount,featured});
+    showToast('Produto adicionado! ✅');
+  }
+  document.getElementById('prodModal').classList.remove('active');
+  renderProducts();
+  renderOverview();
+}
+function deleteProduct(id) {
+  if (!confirm('Excluir este produto?')) return;
+  DB.deleteProduct(id);
+  renderProducts();
+  renderOverview();
+  showToast('Produto removido.');
+}
+
+// CONFIGURAÇÕES
+function changeAdminPass() {
+  const p1 = document.getElementById('newPass1').value;
+  const p2 = document.getElementById('newPass2').value;
+  const msg = document.getElementById('passMsg');
+  if (!p1 || !p2) { msg.textContent='Preencha os dois campos.';msg.className='msg error';return; }
+  if (p1 !== p2) { msg.textContent='As senhas não coincidem.';msg.className='msg error';return; }
+  if (p1.length < 4) { msg.textContent='Senha muito curta.';msg.className='msg error';return; }
+  DB.setAdminPassword(p1);
+  msg.textContent='Senha alterada com sucesso!';
+  msg.className='msg';
+  msg.style.background='rgba(46,204,113,.15)';
+  msg.style.border='1px solid rgba(46,204,113,.3)';
+  msg.style.color='#2ecc71';
+  msg.style.display='block';
+  document.getElementById('newPass1').value='';
+  document.getElementById('newPass2').value='';
+}
+function resetProducts() {
+  if (!confirm('Resetar todos os produtos para o padrão? Esta ação não pode ser desfeita.')) return;
+  localStorage.removeItem('mh_products');
+  DB.getProducts();
+  renderProducts();
+  renderOverview();
+  showToast('Produtos resetados para o padrão! ✅');
+}
+
+// TOAST
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+</script>
+</body>
+</html>
